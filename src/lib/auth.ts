@@ -1,6 +1,7 @@
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import NextAuth from 'next-auth'
 import GitHubProvider from 'next-auth/providers/github'
+import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/nodemailer'
 
 import { LoginEmail, LoginEmailText } from '@/emails/login-email'
@@ -15,7 +16,12 @@ export const {
 } = NextAuth({
   adapter: PrismaAdapter(db),
   providers: [
-    GitHubProvider,
+    GitHubProvider({
+      allowDangerousEmailAccountLinking: true
+    }),
+    GoogleProvider({
+      allowDangerousEmailAccountLinking: true
+    }),
     EmailProvider({
       server: {},
       sendVerificationRequest: async ({ identifier, url }) => {

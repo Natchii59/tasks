@@ -23,7 +23,7 @@ import { Input } from '../ui/input'
 import { updateUser } from './settings-actions'
 
 type SettingsFormProps = {
-  user: User
+  user: Pick<User, 'email' | 'name'>
 }
 
 const schema = z.object({
@@ -64,10 +64,7 @@ export function SettingsForm({ user }: SettingsFormProps) {
     setIsLoading(true)
 
     try {
-      await updateUser({
-        ...data,
-        id: user.id
-      })
+      await updateUser(data)
 
       toast.success('Your account has been updated')
     } catch (err: any) {

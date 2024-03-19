@@ -88,15 +88,27 @@ export function LoginForm() {
         </div>
       </div>
 
-      <Button
-        type='button'
-        variant='outline'
-        className='gap-x-2'
-        onClick={() => signIn('github', { callbackUrl })}
-      >
-        <Icons.github className='size-4' />
-        <span>Github</span>
-      </Button>
+      <div className='grid gap-2 sm:grid-cols-2'>
+        <Button
+          type='button'
+          variant='outline'
+          className='gap-x-2'
+          onClick={() => signIn('github', { callbackUrl })}
+        >
+          <Icons.github className='size-4' />
+          <span>Github</span>
+        </Button>
+
+        <Button
+          type='button'
+          variant='outline'
+          className='gap-x-2'
+          onClick={() => signIn('google', { callbackUrl })}
+        >
+          <Icons.google className='size-4' />
+          <span>Google</span>
+        </Button>
+      </div>
     </div>
   )
 }

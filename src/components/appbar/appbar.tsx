@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
 
+import { Icons } from '../icons'
 import { buttonVariants } from '../ui/button'
 import { UserDropdown } from './user-dropdown'
 
@@ -17,10 +18,11 @@ export function Appbar({ user }: AppbarProps) {
         href='/'
         className={cn(
           buttonVariants({ variant: 'none', size: 'none' }),
-          'text-2xl font-bold'
+          'group gap-x-2 text-2xl font-bold'
         )}
       >
-        Tasks
+        <Icons.logo className='size-6 text-primary group-hover:animate-wiggle motion-reduce:animate-none' />
+        <span>Tasks</span>
       </Link>
 
       <UserDropdown user={user} />

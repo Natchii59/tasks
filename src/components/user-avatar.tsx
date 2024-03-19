@@ -31,7 +31,7 @@ export function UserAvatar({ image, name, className }: UserAvatarProps) {
           {name ? (
             <span className='text-lg font-semibold uppercase'>{name[0]}</span>
           ) : (
-            <Icons.users className='size-4' />
+            <Icons.user className='size-4' />
           )}
         </AvatarFallback>
       )}

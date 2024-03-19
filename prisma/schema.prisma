@@ -50,6 +50,8 @@ model User {
 
   accounts Account[]
   sessions Session[]
+  lists    List[]
+  Task     Task[]
 
   @@map("users")
 }
@@ -61,4 +63,30 @@ model VerificationToken {
 
   @@unique([identifier, token])
   @@map("verification_tokens")
+}
+
+model List {
+  id   String @id @default(cuid())
+  name String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  tasks Task[]
+
+  @@map("lists")
+}
+
+model Task {
+  id          String @id @default(cuid())
+  title       String
+  description String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @map("user_id")
+
+  list   List?   @relation(fields: [listId], references: [id], onDelete: SetNull)
+  listId String? @map("list_id")
+
+  @@map("tasks")
 }
