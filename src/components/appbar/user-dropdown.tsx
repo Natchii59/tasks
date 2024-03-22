@@ -63,8 +63,8 @@ export function UserDropdown({ user }: UserDropdownProps) {
 
         <DropdownMenuItem className='gap-x-2' asChild>
           <Link href='/settings'>
-            <Icons.settings className='size-4' />
-            <span>Settings</span>
+            <Icons.userSettings className='size-4' />
+            <span>Account</span>
           </Link>
         </DropdownMenuItem>
 

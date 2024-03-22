@@ -5,22 +5,52 @@ import { cn } from '@/lib/utils'
 
 import { Icons } from './icons'
 
-const baseCategories = [
-  { name: 'All', icon: Icons.inbox, href: 'all' },
-  { name: 'Today', icon: Icons.calendar, href: 'today', isToday: true },
-  { name: 'Upcoming', icon: Icons.calendarDays, href: 'upcoming' },
-  { name: 'Done', icon: Icons.check, href: 'done' }
-]
+type CategoriesProps = {
+  tasksCount: {
+    all: number
+    today: number
+    upcoming: number
+    done: number
+  }
+}
 
-export function Categories() {
+export function Categories({ tasksCount }: CategoriesProps) {
   const today = getDate(new Date())
+
+  const baseCategories = [
+    {
+      name: 'All',
+      icon: Icons.inbox,
+      href: 'all',
+      count: tasksCount.all
+    },
+    {
+      name: 'Today',
+      icon: Icons.calendar,
+      href: 'today',
+      isToday: true,
+      count: tasksCount.today
+    },
+    {
+      name: 'Upcoming',
+      icon: Icons.calendarDays,
+      href: 'upcoming',
+      count: tasksCount.upcoming
+    },
+    {
+      name: 'Done',
+      icon: Icons.check,
+      href: 'done',
+      count: tasksCount.done
+    }
+  ]
 
   return (
     <div className='grid gap-2 sm:grid-cols-2'>
       {baseCategories.map((category, i) => (
         <Link
           key={i}
-          href={`/categories/${category.href}`}
+          href='/'
           className='group relative rounded-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
         >
           <div className='absolute inset-0 flex items-center justify-center'>
@@ -48,7 +78,7 @@ export function Categories() {
 
             <div className='flex items-center justify-between'>
               <h3 className='text-xl font-bold sm:text-2xl'>{category.name}</h3>
-              <p className='text-lg font-bold sm:text-xl'>0</p>
+              <p className='text-lg font-bold sm:text-xl'>{category.count}</p>
             </div>
           </div>
         </Link>

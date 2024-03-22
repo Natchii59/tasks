@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { List } from '@prisma/client'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -18,7 +19,7 @@ import {
   FormMessage
 } from '../ui/form'
 import { Input } from '../ui/input'
-import { createList } from './list-actions'
+import { updateList } from './list-actions'
 
 const schema = z.object({
   name: z.string().min(3, {
@@ -28,31 +29,33 @@ const schema = z.object({
 
 type SchemaType = z.infer<typeof schema>
 
-type CreateListFormProps = {
-  className?: string
-  submitButtonClassName?: string
+type EditListFormProps = {
+  list: Pick<List, 'id' | 'name'>
   submitButton?:
     | React.ReactNode
     | (({}: { isLoading: boolean }) => React.ReactNode)
+  submitButtonClassName?: string
+  className?: string
   onSuccess?: () => void
 }
 
-export function CreateListForm({
+export function EditListForm({
+  list,
   className,
-  submitButtonClassName,
   submitButton,
+  submitButtonClassName,
   onSuccess
-}: CreateListFormProps) {
+}: EditListFormProps) {
   const form = useForm<SchemaType>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: ''
+      name: list.name
     }
   })
 
   const { mutate, isLoading } = useMutation({
     mutationFn: async (data: SchemaType) => {
-      await createList(data)
+      await updateList({ id: list.id, data })
 
       if (onSuccess) {
         onSuccess()
@@ -70,7 +73,7 @@ export function CreateListForm({
             <FormItem>
               <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input {...field} placeholder='My new list' />
+                <Input {...field} placeholder='New name' />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -90,7 +93,7 @@ export function CreateListForm({
             disabled={isLoading}
           >
             {isLoading && <Icons.spinner className='size-4 animate-spin' />}
-            <span>Submit</span>
+            <span>Update</span>
           </Button>
         )}
       </form>

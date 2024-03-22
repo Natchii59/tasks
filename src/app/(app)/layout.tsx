@@ -9,8 +9,9 @@ export default async function AppLayout({ children }: React.PropsWithChildren) {
   if (!session) redirect('/login', RedirectType.replace)
 
   return (
-    <main className='relative h-screen bg-dot-black/[0.15] dark:bg-dot-white/[0.15]'>
-      <div className='pointer-events-none absolute inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]' />
+    <main className='relative'>
+      <div className='fixed inset-0 bg-dot-black/[0.15] dark:bg-dot-white/[0.15]' />
+      <div className='pointer-events-none fixed inset-0 flex items-center justify-center bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]' />
 
       <div className='container relative z-20'>
         <Appbar user={session.user} />

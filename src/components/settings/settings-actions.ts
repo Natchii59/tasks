@@ -25,15 +25,31 @@ export async function updateUser(input: UpdateUserInput) {
     })
 
     revalidatePath('/settings')
-  } catch (err: any) {
+  } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      const target = err.meta?.target as any
+      const target = err.meta?.target as string[] | undefined
       if (target && target.includes('email')) {
         throw new Error('This email is already in use')
       }
+    } else if (err instanceof Error) {
+      throw new Error(err.message)
     }
+  }
+}
 
-    throw new Error(err.message)
+type DeleteUserInput = Pick<User, 'id'>
+
+export async function deleteUser({ id }: DeleteUserInput) {
+  try {
+    await db.user.delete({
+      where: { id }
+    })
+
+    revalidatePath('/settings')
+  } catch (err) {
+    if (err instanceof Error) {
+      throw new Error(err.message)
+    }
   }
 }
 
@@ -46,7 +62,9 @@ export async function deleteAccount({ id }: DeleteAccountInput) {
     })
 
     revalidatePath('/settings')
-  } catch (err: any) {
-    throw new Error(err.message)
+  } catch (err) {
+    if (err instanceof Error) {
+      throw new Error(err.message)
+    }
   }
 }

@@ -78,9 +78,11 @@ model List {
 }
 
 model Task {
-  id          String @id @default(cuid())
+  id          String    @id @default(cuid())
   title       String
-  description String
+  description String?
+  date        DateTime?
+  done        Boolean   @default(false)
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @map("user_id")

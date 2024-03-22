@@ -2,11 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { User } from '@prisma/client'
-import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { useMutation } from '@/hooks/use-mutation'
 import { neutralValuesToNull } from '@/lib/zod'
 
 import { Icons } from '../icons'
@@ -49,9 +49,9 @@ const schema = z.object({
   )
 })
 
-export function SettingsForm({ user }: SettingsFormProps) {
-  const [isLoading, setIsLoading] = useState<boolean>(false)
+type SchemaType = z.infer<typeof schema>
 
+export function SettingsForm({ user }: SettingsFormProps) {
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -60,23 +60,17 @@ export function SettingsForm({ user }: SettingsFormProps) {
     }
   })
 
-  async function onSubmit(data: z.infer<typeof schema>) {
-    setIsLoading(true)
-
-    try {
+  const { mutate, isLoading } = useMutation({
+    mutationFn: async (data: SchemaType) => {
       await updateUser(data)
 
       toast.success('Your account has been updated')
-    } catch (err: any) {
-      toast.error(err.message)
-    } finally {
-      setIsLoading(false)
     }
-  }
+  })
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-4'>
+      <form onSubmit={form.handleSubmit(mutate)} className='space-y-4'>
         <FormField
           control={form.control}
           name='email'

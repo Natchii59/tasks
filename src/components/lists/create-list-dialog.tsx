@@ -26,9 +26,9 @@ import {
 } from '../ui/drawer'
 import { CreateListForm } from './create-list-form'
 
-type CreateListProps = React.PropsWithChildren
+type CreateListDialogProps = React.PropsWithChildren
 
-export function CreateList({ children }: CreateListProps) {
+export function CreateListDialog({ children }: CreateListDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
 
   const isDesktop = useMediaQuery('(min-width: 768px)')
