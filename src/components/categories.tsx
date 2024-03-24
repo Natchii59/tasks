@@ -1,4 +1,5 @@
 import { getDate } from 'date-fns'
+import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
@@ -15,30 +16,32 @@ type CategoriesProps = {
 }
 
 export function Categories({ tasksCount }: CategoriesProps) {
+  const t = useTranslations('Home.Categories')
+
   const today = getDate(new Date())
 
   const baseCategories = [
     {
-      name: 'All',
+      name: t('all'),
       icon: Icons.inbox,
       href: 'all',
       count: tasksCount.all
     },
     {
-      name: 'Today',
+      name: t('today'),
       icon: Icons.calendar,
       href: 'today',
       isToday: true,
       count: tasksCount.today
     },
     {
-      name: 'Upcoming',
+      name: t('upcoming'),
       icon: Icons.calendarDays,
       href: 'upcoming',
       count: tasksCount.upcoming
     },
     {
-      name: 'Done',
+      name: t('done'),
       icon: Icons.check,
       href: 'done',
       count: tasksCount.done

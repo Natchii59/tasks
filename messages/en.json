@@ -1,0 +1,20 @@
+{
+  "LoginPage": {
+    "title": "Sign in to your account"
+  },
+  "LoginForm": {
+    "emailPlaceholder": "example@email.com",
+    "signInWithEmail": "Sign in with email",
+    "providers": "Or continue with"
+  },
+  "Home": {
+    "Categories": {
+      "all": "All",
+      "today": "Today",
+      "upcoming": "Upcoming",
+      "done": "Done"
+    },
+    "listsTitle": "My lists",
+    "createList": "Create a new list"
+  }
+}

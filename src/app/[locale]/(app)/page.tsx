@@ -1,5 +1,6 @@
 import { startOfToday, startOfTomorrow } from 'date-fns'
 import { Session } from 'next-auth'
+import { getTranslations } from 'next-intl/server'
 import { unstable_cache as cache } from 'next/cache'
 
 import { Categories } from '@/components/categories'
@@ -105,6 +106,8 @@ const getCachedTasksCount = cache(
 )
 
 export default async function Page() {
+  const t = await getTranslations('Home')
+
   const session = (await auth()) as Session
 
   const lists = await getCachedLists(session.user.id)
@@ -119,7 +122,7 @@ export default async function Page() {
         <Categories tasksCount={tasksCount} />
 
         <div className='mb-4 mt-8 flex items-center justify-between'>
-          <h2 className='text-2xl font-bold'>My lists</h2>
+          <h2 className='text-2xl font-bold'>{t('listsTitle')}</h2>
 
           <CreateListDialog>
             <Button
@@ -128,7 +131,7 @@ export default async function Page() {
               className='gap-x-1.5 text-primary'
             >
               <Icons.plusCircle className='size-5 sm:size-4' />
-              <span className='hidden sm:block'>Create a new list</span>
+              <span className='hidden sm:block'>{t('createList')}</span>
             </Button>
           </CreateListDialog>
         </div>

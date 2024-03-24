@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
+import { useTranslations } from 'next-intl'
 import { useSearchParams } from 'next/navigation'
 import { useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -23,6 +24,8 @@ const schema = z.object({
 })
 
 export function LoginForm() {
+  const t = useTranslations('LoginForm')
+
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -62,7 +65,7 @@ export function LoginForm() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input placeholder='example@email.com' {...field} />
+                  <Input placeholder={t('emailPlaceholder')} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -71,7 +74,7 @@ export function LoginForm() {
 
           <Button type='submit' className='w-full gap-x-2' disabled={isLoading}>
             {isLoading && <Icons.spinner className='size-4 animate-spin' />}
-            <span>Sign in with email</span>
+            <span>{t('signInWithEmail')}</span>
           </Button>
         </form>
       </Form>
@@ -83,7 +86,7 @@ export function LoginForm() {
 
         <div className='relative flex justify-center text-xs uppercase'>
           <span className='bg-background px-2 text-muted-foreground'>
-            Or continue with
+            {t('providers')}
           </span>
         </div>
       </div>
