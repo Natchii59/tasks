@@ -66,7 +66,7 @@ export function Categories({ tasksCount }: CategoriesProps) {
               <div className='relative flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground sm:size-9'>
                 <category.icon className='size-5 sm:size-6' />
 
-                <div className='absolute inset-0 top-1.5 flex items-center justify-center sm:top-2'>
+                <div className='absolute inset-0 top-[7px] flex items-center justify-center sm:top-2'>
                   <p className='text-3xs font-semibold sm:text-2xs'>{today}</p>
                 </div>
               </div>

@@ -2,13 +2,12 @@
 
 import { User } from 'next-auth'
 import { signOut } from 'next-auth/react'
-import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { useMemo } from 'react'
 
 import { cn } from '@/lib/utils'
 
 import { Icons } from '../icons'
+import { ThemeDropdown } from '../theme-dropdown'
 import { buttonVariants } from '../ui/button'
 import {
   DropdownMenu,
@@ -16,9 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger
 } from '../ui/dropdown-menu'
 import { UserAvatar } from '../user-avatar'
@@ -28,16 +24,6 @@ type UserDropdownProps = {
 }
 
 export function UserDropdown({ user }: UserDropdownProps) {
-  const { theme, setTheme } = useTheme()
-
-  const IconTheme = useMemo(() => {
-    if (theme === 'dark') {
-      return Icons.moon
-    } else {
-      return Icons.sun
-    }
-  }, [theme])
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -68,38 +54,11 @@ export function UserDropdown({ user }: UserDropdownProps) {
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className='gap-x-2'>
-            <IconTheme className='size-4' />
-            <span>Theme</span>
-          </DropdownMenuSubTrigger>
-
-          <DropdownMenuSubContent sideOffset={4}>
-            <DropdownMenuItem
-              onClick={() => setTheme('light')}
-              className='gap-x-2'
-            >
-              <Icons.sun className='size-4' />
-              <span>Light</span>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              onClick={() => setTheme('dark')}
-              className='gap-x-2'
-            >
-              <Icons.moon className='size-4' />
-              <span>Dark</span>
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              onClick={() => setTheme('system')}
-              className='gap-x-2'
-            >
-              <Icons.laptop className='size-4' />
-              <span>System</span>
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
+        <ThemeDropdown subMenu sideOffset={4} triggerClassName='gap-x-2'>
+          <Icons.sun className='size-4 dark:hidden' />
+          <Icons.moon className='hidden size-4 dark:block' />
+          <span>Theme</span>
+        </ThemeDropdown>
 
         <DropdownMenuSeparator />
 
