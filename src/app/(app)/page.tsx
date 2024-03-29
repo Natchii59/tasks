@@ -90,7 +90,7 @@ const getCachedTasksWithNoListCount = cache(
   async userId => getTasksWithNoListCount(userId),
   ['tasksWithNoList'],
   {
-    tags: ['tasks', 'tasksWithNoList'],
+    tags: ['tasks'],
     revalidate: 3600
   }
 )

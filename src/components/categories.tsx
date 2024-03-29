@@ -28,7 +28,6 @@ export function Categories({ tasksCount }: CategoriesProps) {
       name: 'Today',
       icon: Icons.calendar,
       href: 'today',
-      isToday: true,
       count: tasksCount.today
     },
     {
@@ -43,14 +42,14 @@ export function Categories({ tasksCount }: CategoriesProps) {
       href: 'done',
       count: tasksCount.done
     }
-  ]
+  ] as const
 
   return (
     <div className='grid gap-2 sm:grid-cols-2'>
       {baseCategories.map((category, i) => (
         <Link
           key={i}
-          href='/'
+          href={`/categories/${category.href}`}
           className='group relative rounded-md ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
         >
           <div className='absolute inset-0 flex items-center justify-center'>
@@ -62,7 +61,7 @@ export function Categories({ tasksCount }: CategoriesProps) {
               'space-y-2 rounded-md p-4 shadow-sm backdrop-blur-3xl sm:space-y-4 sm:p-6'
             )}
           >
-            {category.isToday ? (
+            {category.href === 'today' ? (
               <div className='relative flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground sm:size-9'>
                 <category.icon className='size-5 sm:size-6' />
 
