@@ -5,6 +5,7 @@ import { SessionProvider } from 'next-auth/react'
 import { useState } from 'react'
 
 import { Analytics } from './analytics'
+import { SpeedInsights } from './speed-insights'
 import { ThemeProvider } from './theme-provider'
 import { Toaster } from './ui/sonner'
 
@@ -34,6 +35,7 @@ export function Providers({ children }: React.PropsWithChildren) {
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
           {children}
           <Analytics />
+          <SpeedInsights />
           <Toaster />
         </ThemeProvider>
       </QueryClientProvider>
