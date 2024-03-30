@@ -2,8 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { signIn } from 'next-auth/react'
-import { useSearchParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -23,7 +22,6 @@ const schema = z.object({
 })
 
 export function LoginForm() {
-  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const form = useForm<z.infer<typeof schema>>({
@@ -33,10 +31,6 @@ export function LoginForm() {
     },
     reValidateMode: 'onChange'
   })
-
-  const callbackUrl = useMemo(() => {
-    return searchParams.get('callbackUrl') ?? '/'
-  }, [searchParams])
 
   async function onSubmit(data: z.infer<typeof schema>) {
     setIsLoading(true)
@@ -93,7 +87,7 @@ export function LoginForm() {
           type='button'
           variant='outline'
           className='gap-x-2'
-          onClick={() => signIn('github', { callbackUrl })}
+          onClick={() => signIn('github', { callbackUrl: '/' })}
         >
           <Icons.github className='size-4' />
           <span>Github</span>
@@ -103,7 +97,7 @@ export function LoginForm() {
           type='button'
           variant='outline'
           className='gap-x-2'
-          onClick={() => signIn('google', { callbackUrl })}
+          onClick={() => signIn('google', { callbackUrl: '/' })}
         >
           <Icons.google className='size-4' />
           <span>Google</span>
