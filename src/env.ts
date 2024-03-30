@@ -4,7 +4,8 @@ import { z } from 'zod'
 export const env = createEnv({
   server: {
     VERCEL_ENV: z.string().optional(),
-    DATABASE_URL: z.string(),
+    POSTGRES_PRISMA_URL: z.string(),
+    POSTGRES_URL_NON_POOLING: z.string(),
     AUTH_SECRET: z.string(),
     AUTH_GITHUB_ID: z.string(),
     AUTH_GITHUB_SECRET: z.string(),
