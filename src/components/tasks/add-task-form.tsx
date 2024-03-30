@@ -27,17 +27,17 @@ const schema = z.object({
 
 type SchemaType = z.infer<typeof schema>
 
-type CreateTaskFormProps = {
+type AddTaskFormProps = {
   addOptimisticTask: (task: Task) => void
   className?: string
   defaultDate?: Date
 }
 
-export function CreateTaskForm({
+export function AddTaskForm({
   addOptimisticTask,
   className,
   defaultDate
-}: CreateTaskFormProps) {
+}: AddTaskFormProps) {
   const session = useSession()
 
   const form = useForm<SchemaType>({

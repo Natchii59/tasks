@@ -31,12 +31,9 @@ export async function createList(input: CreateListInput) {
   }
 }
 
-type UpdateListInput = {
-  id: string
-  data: Partial<Pick<List, 'name'>>
-}
+type UpdateListInput = Partial<Pick<List, 'name'>>
 
-export async function updateList({ id, data }: UpdateListInput) {
+export async function updateList(id: string, input: UpdateListInput) {
   try {
     const session = await auth()
 
@@ -49,7 +46,7 @@ export async function updateList({ id, data }: UpdateListInput) {
         id,
         userId: session.user.id
       },
-      data
+      data: input
     })
 
     revalidateTag('lists')

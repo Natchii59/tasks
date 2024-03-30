@@ -1,13 +1,20 @@
-import { Task } from '@prisma/client'
+import { List, Task } from '@prisma/client'
 import { useOptimistic } from 'react'
 import { toast } from 'sonner'
 
 import { cn } from '@/lib/utils'
 
+import { Icons } from '../icons'
 import { RadioButton } from '../radio-button'
+import { Button } from '../ui/button'
 import { updateTask } from './task-actions'
+import { TaskInfoPopover } from './task-info-popover'
 
-type TaskOptimistic = Task & {
+type TaskWithList = Task & {
+  list: Pick<List, 'id' | 'name'> | null
+}
+
+type TaskOptimistic = TaskWithList & {
   loading?: boolean
 }
 
@@ -37,7 +44,7 @@ export function TaskItem({ task, className }: TaskItemProps) {
 
   return (
     <div className={cn('flex flex-col gap-y-0.5', className)}>
-      <form action={handleDoneTask} className='flex items-center gap-x-2'>
+      <form action={handleDoneTask} className='group flex items-center gap-x-2'>
         <RadioButton
           selected={optimisticTask.done}
           type={optimisticTask.loading ? 'button' : 'submit'}
@@ -49,12 +56,22 @@ export function TaskItem({ task, className }: TaskItemProps) {
 
         <p
           className={cn(
-            'font-medium',
+            'flex-1 font-medium',
             optimisticTask.done && 'text-muted-foreground line-through'
           )}
         >
           {optimisticTask.title}
         </p>
+
+        <TaskInfoPopover task={task}>
+          <Button
+            size='none'
+            variant='none'
+            className='hidden text-primary group-hover:flex data-[state=open]:flex'
+          >
+            <Icons.info className='size-4' />
+          </Button>
+        </TaskInfoPopover>
       </form>
 
       {optimisticTask.description && (

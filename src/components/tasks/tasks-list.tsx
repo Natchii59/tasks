@@ -1,21 +1,25 @@
 'use client'
 
-import { Task } from '@prisma/client'
+import { List, Task } from '@prisma/client'
 import { addDays, startOfToday } from 'date-fns'
 import { useOptimistic } from 'react'
 
 import { cn } from '@/lib/utils'
 
-import { CreateTaskForm } from './create-task-form'
+import { AddTaskForm } from './add-task-form'
 import { TaskItem } from './task-item'
 
+type TaskWithList = Task & {
+  list: Pick<List, 'id' | 'name'> | null
+}
+
 type TasksListProps = {
-  tasks: Task[]
+  tasks: TaskWithList[]
   className?: string
   type: 'all' | 'today' | 'upcoming' | 'done' | 'list'
 }
 
-type TaskOptimistic = Task & {
+type TaskOptimistic = TaskWithList & {
   loading?: boolean
 }
 
@@ -24,7 +28,7 @@ export function TasksList({ tasks, className, type }: TasksListProps) {
     TaskOptimistic[],
     Task
   >(tasks, (state, newTask) => {
-    return [...state, { ...newTask, loading: true }]
+    return [...state, { ...newTask, loading: true, list: null }]
   })
 
   return (
@@ -40,7 +44,7 @@ export function TasksList({ tasks, className, type }: TasksListProps) {
       )}
 
       {type !== 'done' && (
-        <CreateTaskForm
+        <AddTaskForm
           addOptimisticTask={addOptimisticTask}
           className='border-b pb-2'
           defaultDate={

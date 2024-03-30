@@ -1,6 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
+import { List } from '@prisma/client'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -18,7 +19,7 @@ import {
   FormMessage
 } from '../ui/form'
 import { Input } from '../ui/input'
-import { createList } from './list-actions'
+import { createList, updateList } from './list-actions'
 
 const schema = z.object({
   name: z.string().min(3, {
@@ -28,7 +29,7 @@ const schema = z.object({
 
 type SchemaType = z.infer<typeof schema>
 
-type CreateListFormProps = {
+type BaseProps = {
   className?: string
   submitButtonClassName?: string
   submitButton?:
@@ -37,22 +38,38 @@ type CreateListFormProps = {
   onSuccess?: () => void
 }
 
-export function CreateListForm({
+type CreateListFormProps = {
+  type: 'create'
+}
+
+type EditListFormProps = {
+  type: 'edit'
+  list: List
+}
+
+type ListFormProps = BaseProps & (CreateListFormProps | EditListFormProps)
+
+export function ListForm({
   className,
   submitButtonClassName,
   submitButton,
-  onSuccess
-}: CreateListFormProps) {
+  onSuccess,
+  ...props
+}: ListFormProps) {
   const form = useForm<SchemaType>({
     resolver: zodResolver(schema),
     defaultValues: {
-      name: ''
+      name: props.type === 'edit' ? props.list.name : ''
     }
   })
 
   const { mutate, isLoading } = useMutation({
     mutationFn: async (data: SchemaType) => {
-      await createList(data)
+      if (props.type === 'create') {
+        await createList(data)
+      } else {
+        await updateList(props.list.id, data)
+      }
 
       if (onSuccess) {
         onSuccess()
@@ -90,7 +107,7 @@ export function CreateListForm({
             disabled={isLoading}
           >
             {isLoading && <Icons.spinner className='size-4 animate-spin' />}
-            <span>Submit</span>
+            <span>{props.type === 'create' ? 'Submit' : 'Update'}</span>
           </Button>
         )}
       </form>

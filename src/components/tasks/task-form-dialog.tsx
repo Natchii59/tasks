@@ -1,6 +1,6 @@
 'use client'
 
-import { List } from '@prisma/client'
+import { Task } from '@prisma/client'
 import { useState } from 'react'
 import { useMediaQuery } from 'usehooks-ts'
 
@@ -25,13 +25,24 @@ import {
   DrawerTitle,
   DrawerTrigger
 } from '../ui/drawer'
-import { CreateTaskFormDialog } from './create-task-form-dialog'
+import { TaskForm } from './task-form'
 
-type CreateTaskProps = React.PropsWithChildren & {
-  lists: Pick<List, 'id' | 'name'>[]
+type BaseProps = {
+  children: React.ReactNode
 }
 
-export function CreateTaskDialog({ children, lists }: CreateTaskProps) {
+type CreateTaskFormProps = {
+  type: 'create'
+}
+
+type EditTaskFormProps = {
+  type: 'edit'
+  task: Task
+}
+
+type TaskFormDialogProps = BaseProps & (CreateTaskFormProps | EditTaskFormProps)
+
+export function TaskFormDialog({ children, ...props }: TaskFormDialogProps) {
   const [open, setOpen] = useState<boolean>(false)
 
   const isDesktop = useMediaQuery('(min-width: 768px)')
@@ -47,15 +58,29 @@ export function CreateTaskDialog({ children, lists }: CreateTaskProps) {
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Create a new task</DialogTitle>
+            <DialogTitle>
+              {props.type === 'create' ? 'Create a new task' : 'Edit task'}
+            </DialogTitle>
             <DialogDescription>
-              A task is a single unit of work. You can add tasks to a list,
-              remove tasks from a list, and mark tasks as completed.
+              {props.type === 'create' ? (
+                <>
+                  A task is a single unit of work. You can add tasks to a list,
+                  remove tasks from a list, and mark tasks as completed.
+                </>
+              ) : (
+                <>
+                  You currently editing the task &quot;
+                  <span className='font-semibold'>{props.task.title}</span>
+                  &quot;.
+                </>
+              )}
             </DialogDescription>
           </DialogHeader>
 
-          <CreateTaskFormDialog
-            lists={lists}
+          <TaskForm
+            {...(props.type === 'create'
+              ? { type: 'create' }
+              : { type: 'edit', task: props.task })}
             onSuccess={onSuccess}
             submitButton={({ isLoading }) => (
               <DialogFooter>
@@ -63,7 +88,7 @@ export function CreateTaskDialog({ children, lists }: CreateTaskProps) {
                   {isLoading && (
                     <Icons.spinner className='size-4 animate-spin' />
                   )}
-                  <span>Submit</span>
+                  <span>{props.type === 'create' ? 'Submit' : 'Update'}</span>
                 </Button>
               </DialogFooter>
             )}
@@ -78,15 +103,29 @@ export function CreateTaskDialog({ children, lists }: CreateTaskProps) {
 
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Create a new task</DrawerTitle>
+          <DrawerTitle>
+            {props.type === 'create' ? 'Create a new task' : 'Edit task'}
+          </DrawerTitle>
           <DrawerDescription>
-            A task is a single unit of work. You can add tasks to a list, remove
-            tasks from a list, and mark tasks as completed.
+            {props.type === 'create' ? (
+              <>
+                A task is a single unit of work. You can add tasks to a list,
+                remove tasks from a list, and mark tasks as completed.
+              </>
+            ) : (
+              <>
+                You currently editing the task &quot;
+                <span className='font-semibold'>{props.task.title}</span>
+                &quot;.
+              </>
+            )}
           </DrawerDescription>
         </DrawerHeader>
 
-        <CreateTaskFormDialog
-          lists={lists}
+        <TaskForm
+          {...(props.type === 'create'
+            ? { type: 'create' }
+            : { type: 'edit', task: props.task })}
           className='px-4'
           submitButtonClassName='mt-2 w-full'
           onSuccess={onSuccess}

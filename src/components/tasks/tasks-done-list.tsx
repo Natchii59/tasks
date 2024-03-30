@@ -48,10 +48,7 @@ export function TasksDoneList({ tasks, className }: TasksDoneProps) {
               <>
                 <Icons.circle className='size-1.5 fill-current' />
 
-                <DeleteTasksDialog
-                  type='multiple'
-                  taskIds={tasks.map(task => task.id)}
-                >
+                <DeleteTasksDialog taskIds={tasks.map(task => task.id)}>
                   <Button
                     variant='none'
                     size='none'

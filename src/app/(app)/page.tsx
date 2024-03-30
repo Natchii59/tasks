@@ -4,9 +4,9 @@ import { unstable_cache as cache } from 'next/cache'
 
 import { Categories } from '@/components/categories'
 import { Icons } from '@/components/icons'
-import { CreateListDialog } from '@/components/lists/create-list-dialog'
+import { ListFormDialog } from '@/components/lists/list-form-dialog'
 import { Lists } from '@/components/lists/lists'
-import { CreateTaskDialog } from '@/components/tasks/create-task-dialog'
+import { TaskFormDialog } from '@/components/tasks/task-form-dialog'
 import { Button } from '@/components/ui/button'
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/prisma'
@@ -35,7 +35,7 @@ async function getLists(userId: string) {
   }))
 }
 
-async function getTasksWithNoListCount(userId: string) {
+async function getTasksCountFromBaseList(userId: string) {
   return db.task.count({
     where: {
       userId,
@@ -86,11 +86,11 @@ const getCachedLists = cache(async userId => getLists(userId), ['lists'], {
   revalidate: 3600
 })
 
-const getCachedTasksWithNoListCount = cache(
-  async userId => getTasksWithNoListCount(userId),
-  ['tasksWithNoList'],
+const getCachedTasksCountFromBaseList = cache(
+  async userId => getTasksCountFromBaseList(userId),
+  ['tasksCountFromBaseList'],
   {
-    tags: ['tasks'],
+    tags: ['baseList'],
     revalidate: 3600
   }
 )
@@ -109,7 +109,9 @@ export default async function Page() {
 
   const lists = await getCachedLists(session.user.id)
 
-  const tasksWithNoList = await getCachedTasksWithNoListCount(session.user.id)
+  const taskCountFromBaseList = await getCachedTasksCountFromBaseList(
+    session.user.id
+  )
 
   const tasksCount = await getCachedTasksCount(session.user.id)
 
@@ -121,7 +123,7 @@ export default async function Page() {
         <div className='mb-4 mt-8 flex items-center justify-between'>
           <h2 className='text-2xl font-bold'>My lists</h2>
 
-          <CreateListDialog>
+          <ListFormDialog type='create'>
             <Button
               variant='none'
               size='none'
@@ -130,15 +132,15 @@ export default async function Page() {
               <Icons.plusCircle className='size-5 sm:size-4' />
               <span className='hidden sm:block'>Create a new list</span>
             </Button>
-          </CreateListDialog>
+          </ListFormDialog>
         </div>
 
-        <Lists lists={lists} tasksWithNoList={tasksWithNoList} />
+        <Lists lists={lists} taskCountFromBaseList={taskCountFromBaseList} />
       </div>
 
       <div className='fixed inset-x-0 bottom-1'>
         <div className='container flex justify-end'>
-          <CreateTaskDialog lists={lists}>
+          <TaskFormDialog type='create'>
             <Button
               size='none'
               className='size-9 gap-x-1 px-0 sm:w-auto sm:px-3'
@@ -146,7 +148,7 @@ export default async function Page() {
               <Icons.plus className='size-5 sm:size-4' />
               <span className='hidden sm:block'>Add task</span>
             </Button>
-          </CreateTaskDialog>
+          </TaskFormDialog>
         </div>
       </div>
     </>

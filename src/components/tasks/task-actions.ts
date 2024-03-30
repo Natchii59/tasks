@@ -35,11 +35,18 @@ export async function createTask(input: CreateTaskInput) {
     return { error: message }
   } finally {
     revalidateTag('tasks')
+
+    if (input.listId) {
+      revalidateTag(`lists`)
+      revalidateTag(`list-${input.listId}`)
+    } else {
+      revalidateTag('baseList')
+    }
   }
 }
 
 type UpdateTaskInput = Partial<
-  Pick<Task, 'title' | 'description' | 'date' | 'done'>
+  Pick<Task, 'title' | 'description' | 'date' | 'listId' | 'done'>
 >
 
 export async function updateTask(id: string, input: UpdateTaskInput) {
@@ -50,7 +57,7 @@ export async function updateTask(id: string, input: UpdateTaskInput) {
       throw new Error('You must be logged in to update a task')
     }
 
-    await db.task.update({
+    const task = await db.task.update({
       where: {
         id,
         userId: session.user.id
@@ -59,9 +66,17 @@ export async function updateTask(id: string, input: UpdateTaskInput) {
         title: input.title,
         description: input.description,
         date: input.date,
-        done: input.done
+        done: input.done,
+        listId: input.listId
       }
     })
+
+    if (task.listId) {
+      revalidateTag(`lists`)
+      revalidateTag(`list-${input.listId}`)
+    } else {
+      revalidateTag('baseList')
+    }
   } catch (err) {
     let message = 'Failed to update task'
     if (err instanceof Error) {
@@ -94,8 +109,6 @@ export async function deleteTasks(input: DeleteTasksInput) {
         userId: session.user.id
       }
     })
-
-    revalidateTag('tasks')
   } catch (err) {
     let message = 'Failed to delete tasks'
     if (err instanceof Error) {
@@ -103,5 +116,7 @@ export async function deleteTasks(input: DeleteTasksInput) {
     }
 
     return { error: message }
+  } finally {
+    revalidateTag('tasks')
   }
 }

@@ -1,3 +1,4 @@
+import { List as BaseList } from '@prisma/client'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
@@ -7,50 +8,46 @@ import { Icons, type IconType } from '../icons'
 import { buttonVariants } from '../ui/button'
 import { ListContextMenu } from './list-context-menu'
 
-type List = {
-  id: string
-  name: string
-  icon?: string | null
+type List = BaseList & {
+  iconKey?: string | null
   tasksCount: number
-  isDefault?: boolean
+  isBase?: boolean
 }
 
 type ListsProps = {
   lists: List[]
-  tasksWithNoList: number
+  taskCountFromBaseList: number
 }
 
-type ListWithIcon = {
-  id: string
-  name: string
+type ListWithIcon = List & {
   icon: IconType
-  tasksCount: number
-  isDefault?: boolean
 }
 
-export function Lists({ lists: baseLists, tasksWithNoList }: ListsProps) {
+export function Lists({ lists: baseLists, taskCountFromBaseList }: ListsProps) {
   const lists: ListWithIcon[] = useMemo(() => {
     const lists = baseLists.slice()
     lists.unshift({
       id: 'tasks',
       name: 'Tasks',
-      tasksCount: tasksWithNoList,
-      isDefault: true
+      tasksCount: taskCountFromBaseList,
+      isBase: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userId: ''
     })
 
     return lists.map(list => ({
       ...list,
-      icon: list.icon ? Icons[list.icon as keyof typeof Icons] : Icons.list
+      icon: list.iconKey
+        ? Icons[list.iconKey as keyof typeof Icons]
+        : Icons.list
     }))
-  }, [baseLists, tasksWithNoList])
+  }, [baseLists, taskCountFromBaseList])
 
   return (
     <div className='grid gap-y-2'>
-      {lists.map(list => (
-        <ListContextMenu
-          key={list.id}
-          list={{ id: list.id, name: list.name, isDefault: list.isDefault }}
-        >
+      {lists.map(({ icon: ListIcon, ...list }) => (
+        <ListContextMenu key={list.id} list={list}>
           <Link
             href='/'
             className={cn(
@@ -58,7 +55,7 @@ export function Lists({ lists: baseLists, tasksWithNoList }: ListsProps) {
               'flex min-w-0 justify-normal gap-x-2'
             )}
           >
-            <list.icon className='size-5 text-primary' />
+            <ListIcon className='size-5 text-primary' />
 
             <span className='flex-1 truncate font-semibold'>{list.name}</span>
 

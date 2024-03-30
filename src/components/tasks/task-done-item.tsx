@@ -49,7 +49,7 @@ export function TaskDoneItem({ task }: TaskDoneItemProps) {
         {optimisticTask.title}
       </p>
 
-      <DeleteTasksDialog type='single' taskIds={[task.id]}>
+      <DeleteTasksDialog taskIds={[task.id]}>
         <Button
           size='none'
           variant='none'

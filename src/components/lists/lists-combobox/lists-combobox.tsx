@@ -1,18 +1,10 @@
 'use client'
 
-import { List } from '@prisma/client'
+import { useQuery } from '@tanstack/react-query'
 import React, { useState } from 'react'
 import { useMediaQuery } from 'usehooks-ts'
 
 import { Button } from '@/components/ui/button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList
-} from '@/components/ui/command'
 import { Drawer, DrawerContent, DrawerTrigger } from '@/components/ui/drawer'
 import {
   Popover,
@@ -21,18 +13,18 @@ import {
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 
-import { Icons } from '../icons'
-import { FormControl } from '../ui/form'
+import { Icons } from '../../icons'
+import { FormControl } from '../../ui/form'
+import { getLists } from './get-lists'
+import { ListsCommand } from './lists-command'
 
 type ListsComboboxProps = {
-  lists: Pick<List, 'id' | 'name'>[]
   selectedListId: string | null
   setSelectedListId: (listId: string | null) => void
   formControl?: boolean
 }
 
 export function ListsCombobox({
-  lists,
   selectedListId,
   setSelectedListId,
   formControl
@@ -40,6 +32,11 @@ export function ListsCombobox({
   const [open, setOpen] = useState<boolean>(false)
 
   const isDesktop = useMediaQuery('(min-width: 768px)')
+
+  const { data: lists, isLoading } = useQuery({
+    queryKey: ['lists'],
+    queryFn: () => getLists()
+  })
 
   function handleSelect(list: string | null) {
     setSelectedListId(list)
@@ -56,6 +53,7 @@ export function ListsCombobox({
             <Button
               variant='outline'
               className='w-full justify-between gap-x-1'
+              disabled={isLoading}
             >
               <span
                 className={cn(
@@ -63,19 +61,27 @@ export function ListsCombobox({
                   !selectedListId && 'text-muted-foreground'
                 )}
               >
-                {lists.find(list => list.id === selectedListId)?.name ??
-                  'No list'}
+                {!isLoading && lists
+                  ? lists.find(l => l.id === selectedListId)?.name ?? 'No list'
+                  : 'Loading...'}
               </span>
-              <Icons.chevronsUpDown className='size-4 shrink-0 text-muted-foreground' />
+
+              {isLoading ? (
+                <Icons.spinner className='size-4 shrink-0 animate-spin text-muted-foreground' />
+              ) : (
+                <Icons.chevronsUpDown className='size-4 shrink-0 text-muted-foreground' />
+              )}
             </Button>
           </ButtonProvider>
         </PopoverTrigger>
         <PopoverContent className='p-0' align='start'>
-          <ListsList
-            selectedListId={selectedListId}
-            setSelectedListId={handleSelect}
-            lists={lists}
-          />
+          {!isLoading && lists && (
+            <ListsCommand
+              lists={lists}
+              selectedListId={selectedListId}
+              setSelectedListId={handleSelect}
+            />
+          )}
         </PopoverContent>
       </Popover>
     )
@@ -85,68 +91,40 @@ export function ListsCombobox({
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <ButtonProvider>
-          <Button variant='outline' className='w-full justify-between gap-x-1'>
+          <Button
+            variant='outline'
+            className='w-full justify-between gap-x-1'
+            disabled={isLoading}
+          >
             <span
               className={cn(
                 'truncate font-normal',
                 !selectedListId && 'text-muted-foreground'
               )}
             >
-              {lists.find(list => list.id === selectedListId)?.name ??
-                'No list'}
+              {!isLoading && lists
+                ? lists.find(l => l.id === selectedListId)?.name ?? 'No list'
+                : 'Loading...'}
             </span>
-            <Icons.chevronsUpDown className='size-4 shrink-0 text-muted-foreground' />
+            {isLoading ? (
+              <Icons.spinner className='size-4 shrink-0 animate-spin text-muted-foreground' />
+            ) : (
+              <Icons.chevronsUpDown className='size-4 shrink-0 text-muted-foreground' />
+            )}
           </Button>
         </ButtonProvider>
       </DrawerTrigger>
       <DrawerContent>
         <div className='mt-4 border-t'>
-          <ListsList
-            selectedListId={selectedListId}
-            setSelectedListId={handleSelect}
-            lists={lists}
-          />
+          {!isLoading && lists && (
+            <ListsCommand
+              lists={lists}
+              selectedListId={selectedListId}
+              setSelectedListId={handleSelect}
+            />
+          )}
         </div>
       </DrawerContent>
     </Drawer>
-  )
-}
-
-type ListsListProps = {
-  selectedListId: string | null
-  setSelectedListId: (status: string | null) => void
-  lists: Pick<List, 'id' | 'name'>[]
-}
-
-function ListsList({
-  selectedListId,
-  setSelectedListId,
-  lists
-}: ListsListProps) {
-  return (
-    <Command>
-      <CommandInput placeholder='Filter lists...' />
-      <CommandList>
-        <CommandEmpty>No results found.</CommandEmpty>
-        <CommandGroup>
-          {lists.map(list => (
-            <CommandItem
-              key={list.id}
-              value={list.name}
-              onSelect={() => setSelectedListId(list.id)}
-              className='gap-x-2'
-            >
-              <Icons.check
-                className={cn(
-                  'size-4 shrink-0',
-                  selectedListId === list.id ? 'opacity-100' : 'opacity-0'
-                )}
-              />
-              {list.name}
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      </CommandList>
-    </Command>
   )
 }

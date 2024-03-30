@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { List } from '@prisma/client'
+import { Task } from '@prisma/client'
 import { format, subDays } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 import { neutralValuesToNull } from '@/lib/zod'
 
 import { Icons } from '../icons'
-import { ListsCombobox } from '../lists/lists-combobox'
+import { ListsCombobox } from '../lists/lists-combobox/lists-combobox'
 import { Button } from '../ui/button'
 import { Calendar } from '../ui/calendar'
 import {
@@ -25,10 +25,16 @@ import {
 import { Input } from '../ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 import { Textarea } from '../ui/textarea'
-import { createTask } from './task-actions'
+import { createTask, updateTask } from './task-actions'
 
 const schema = z.object({
-  title: z.string().min(1, 'Title is required'),
+  title: z
+    .string({
+      invalid_type_error: 'Title must be a string'
+    })
+    .min(1, {
+      message: 'Title is required'
+    }),
   description: neutralValuesToNull(
     z
       .string({
@@ -37,40 +43,58 @@ const schema = z.object({
       .nullable()
   ),
   listId: neutralValuesToNull(z.string().nullable()),
-  date: neutralValuesToNull(z.date().nullable())
+  date: z.date().optional()
 })
 
 type SchemaType = z.infer<typeof schema>
 
-type CreateTaskFormProps = {
+type BaseProps = {
   submitButton?:
     | React.ReactNode
-    | (({}: { isLoading: boolean }) => React.ReactNode)
+    | ((props: { isLoading: boolean }) => React.ReactNode)
   submitButtonClassName?: string
   className?: string
   onSuccess?: () => void
-  lists: Pick<List, 'id' | 'name'>[]
 }
 
-export function CreateTaskFormDialog({
+type CreateTaskFormProps = {
+  type: 'create'
+}
+
+type EditTaskFormProps = {
+  type: 'edit'
+  task: Task
+}
+
+type TaskFormProps = BaseProps & (CreateTaskFormProps | EditTaskFormProps)
+
+export function TaskForm({
   className,
   submitButton,
   submitButtonClassName,
   onSuccess,
-  lists
-}: CreateTaskFormProps) {
+  ...props
+}: TaskFormProps) {
   const form = useForm<SchemaType>({
     resolver: zodResolver(schema),
     defaultValues: {
-      title: '',
-      description: null,
-      listId: null
+      title: props.type === 'edit' ? props.task.title : '',
+      description: props.type === 'edit' ? props.task.description : null,
+      date:
+        props.type === 'edit' && props.task.date
+          ? new Date(props.task.date)
+          : undefined,
+      listId: props.type === 'edit' ? props.task.listId : null
     }
   })
 
   const { mutate, isLoading } = useMutation({
     mutationFn: async (data: SchemaType) => {
-      await createTask(data)
+      if (props.type === 'create') {
+        await createTask(data)
+      } else {
+        await updateTask(props.task.id, data)
+      }
 
       if (onSuccess) {
         onSuccess()
@@ -82,7 +106,7 @@ export function CreateTaskFormDialog({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(mutate)}
-        className={cn(className, 'grid gap-y-3')}
+        className={cn('grid gap-y-3', className)}
       >
         <FormField
           control={form.control}
@@ -124,7 +148,6 @@ export function CreateTaskFormDialog({
             <FormItem className='overflow-hidden'>
               <FormLabel>List</FormLabel>
               <ListsCombobox
-                lists={lists}
                 selectedListId={field.value}
                 setSelectedListId={field.onChange}
                 formControl
@@ -185,11 +208,11 @@ export function CreateTaskFormDialog({
         ) : (
           <Button
             type='submit'
-            className={cn(submitButtonClassName, 'gap-x-2')}
+            className={cn('gap-x-2', submitButtonClassName)}
             disabled={isLoading}
           >
             {isLoading && <Icons.spinner className='size-4 animate-spin' />}
-            <span>Submit</span>
+            <span>{props.type === 'create' ? 'Submit' : 'Update'}</span>
           </Button>
         )}
       </form>

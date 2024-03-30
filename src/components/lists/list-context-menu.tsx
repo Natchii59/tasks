@@ -12,10 +12,10 @@ import {
   ContextMenuTrigger
 } from '../ui/context-menu'
 import { DeleteListDialog } from './delete-list-dialog'
-import { EditListDialog } from './edit-list-dialog'
+import { ListFormDialog } from './list-form-dialog'
 
 type ListContextMenuProps = React.PropsWithChildren & {
-  list: Pick<List, 'id' | 'name'> & { isDefault?: boolean }
+  list: List & { isBase?: boolean }
 }
 
 export function ListContextMenu({ children, list }: ListContextMenuProps) {
@@ -35,7 +35,7 @@ export function ListContextMenu({ children, list }: ListContextMenuProps) {
             </Link>
           </ContextMenuItem>
 
-          {!list.isDefault && (
+          {!list.isBase && (
             <>
               <ContextMenuItem
                 className='gap-x-1.5'
@@ -57,9 +57,10 @@ export function ListContextMenu({ children, list }: ListContextMenuProps) {
         </ContextMenuContent>
       </ContextMenu>
 
-      {!list.isDefault && (
+      {!list.isBase && (
         <>
-          <EditListDialog
+          <ListFormDialog
+            type='edit'
             list={list}
             open={editOpen}
             onOpenChange={setEditOpen}

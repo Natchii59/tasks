@@ -13,7 +13,15 @@ async function getTasks() {
       done: true,
       userId: session.user.id
     },
-    orderBy: { createdAt: 'asc' }
+    orderBy: { createdAt: 'asc' },
+    include: {
+      list: {
+        select: {
+          id: true,
+          name: true
+        }
+      }
+    }
   })
 
   return tasks

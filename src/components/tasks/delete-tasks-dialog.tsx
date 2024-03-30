@@ -18,7 +18,6 @@ import {
 import { deleteTasks } from './task-actions'
 
 type DeleteTasksDialogProps = React.PropsWithChildren<{
-  type: 'single' | 'multiple'
   taskIds: string[]
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -30,7 +29,6 @@ export function DeleteTasksDialog({
   open,
   onOpenChange,
   onSuccess,
-  type,
   taskIds
 }: DeleteTasksDialogProps) {
   const [baseOpen, setBaseOpen] = useState<boolean>(false)
@@ -78,11 +76,11 @@ export function DeleteTasksDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Delete task{type === 'multiple' && 's'}
+            Delete task{taskIds.length > 1 && 's'}
           </AlertDialogTitle>
           <AlertDialogDescription>
             Are you sure you want to delete this task
-            {type === 'multiple' && 's'}? This action cannot be undone.
+            {taskIds.length > 1 && 's'}? This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
