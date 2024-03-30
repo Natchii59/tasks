@@ -1,4 +1,4 @@
-import { startOfToday, startOfTomorrow } from 'date-fns'
+import { endOfToday, startOfToday, startOfTomorrow } from 'date-fns'
 import { Session } from 'next-auth'
 import { unstable_cache as cache } from 'next/cache'
 
@@ -57,7 +57,10 @@ async function getTasksCount(userId: string) {
     where: {
       userId,
       done: false,
-      date: startOfToday()
+      date: {
+        gte: startOfToday(),
+        lte: endOfToday()
+      }
     }
   })
 

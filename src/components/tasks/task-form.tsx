@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Task } from '@prisma/client'
-import { format, subDays } from 'date-fns'
+import { format, startOfDay, subDays } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -187,7 +187,9 @@ export function TaskForm({
                   <Calendar
                     mode='single'
                     selected={field.value ?? undefined}
-                    onSelect={field.onChange}
+                    onSelect={date => {
+                      field.onChange(date ? startOfDay(date) : undefined)
+                    }}
                     disabled={date => date < subDays(new Date(), 1)}
                     initialFocus
                   />
